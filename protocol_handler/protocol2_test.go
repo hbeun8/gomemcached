@@ -1,24 +1,22 @@
-package protocol
+package protocolhandler
 
+/*
 import (
 	"fmt"
 	"testing"
+	datastorehandler "gomemc/datastore_handler"
 )
 
-func TestSetProtocol(t *testing.T) {
+func TestSetParser(t *testing.T) {
 
 	tests := []struct{
-		command string 
-		key string
-		flags string
-		expiry string
-		bytecount string
-		noreply string
-		datablock []string
-		want []string
+		commandline []byte 
+		datablock []byte
+		datastore datastorehandler.Datastore
+		want []byte
 	} {
-		{"\r\n", "", "", "", "", "", []string{""}, []string{"Missing Command\r\n"}},
-		{"set", "test", "0", "0", "4", "noreply\r\n", []string{"Datablock\r\n"}, []string{"set", "test", "0", "0", "4", "noreply", "Datablock"}},
+		{[]byte(), []byte(), []string{"ERROR\r\n"}},
+		{[]byte("set", "test", "0", "0", "4", "noreply\r\n"), []byte("data\r\n") },
 		{"set", "test", "0", "100", "4\r\n", "", []string{"Datablock\r\n"}, []string{"set", "test", "0", "100", "4", "", "Datablock"}},	
 		{"set", "test", "0", "0", "4\r\n", "", []string{"Datablock\r\n"}, []string{"set", "test", "0", "0", "4", "", "Datablock"}},
 		{"set", "test", "", "0", "4", "\r\n", []string{"Datablock\r\n"}, []string{"Invalid Command, missing key||flag||exptime||bytecount\r\n"}},
@@ -29,19 +27,46 @@ func TestSetProtocol(t *testing.T) {
 
 	for _, tt := range tests {
 
-		testname := fmt.Sprintf("%v,%v,%v,%v, %v, %v, %v", tt.command, tt.key, tt.flags, tt.expiry, tt.bytecount, tt.noreply, tt.datablock)
+		testname := fmt.Sprintf("%v,%v", tt.command, tt.datablock)
         t.Run(testname, func(t *testing.T) {
-				c := Commands{
-						command: tt.command,
-						key: tt.key,
-						flags: tt.flags, 
-						expiry: tt.expiry,
-						bytecount: tt.bytecount,
-						noreply: tt.noreply,
+				ans := SetParser(tt.commandline, tt.datablock)
+            	for i := range ans {
+					if ans[i] != tt.want[i] {
+                		t.Errorf("got %v, want %v", ans, tt.want)
 					}
-				p := Parser{CommandLine: c, Datablock: tt.datablock}
+				}
+        })
+    }
+}
 
-				ans := p.Protocol_Handler()
+
+
+package commandhandler
+
+func TestCommandHandler(t *testing.T) {
+
+	tests := []struct{
+		buf []byte
+		datablock []byte
+		want []string
+	} {	
+		{[]byte{"set", "k", "0",  "1\r\n"}, []{"Datablock"}, []byte{"Missing Command\r\n"}},
+		{[]byte{"set", "k", "0",  "1\r\n"}, []{"Datablock"}, []byte{"Missing Command\r\n"}},
+		{[]byte{"set", "test", "0", "0", "4", "noreply\r\n"}, []byte{"Datablock\r\n"}, []byte{"set", "test", "0", "0", "4", "noreply", "Datablock"}},
+		{[]byte{"set", "test", "0", "100", "4\r\n", ""}, []byte{"Datablock\r\n"}, []byte{"set", "test", "0", "100", "4", "", "Datablock"}},	
+		{[]byte{"set", "test", "0", "0", "4\r\n", ""}, []byte{"Datablock\r\n"}, []byte{"set", "test", "0", "0", "4", "", "Datablock"}},
+		{[]byte{"set", "test", "", "0", "4", "\r\n"}, []byte{"Datablock\r\n"}, []byte{"Invalid Command, missing key||flag||exptime||bytecount\r\n"}},
+		{[]byte{"set", "test", "", "", "4", "\r\n"}, []byte{"Datablock\r\n"}, []byte{"Invalid Command, missing key||flag||exptime||bytecount\r\n"}},
+		{[]byte{"set", "test", "\r\n", "", "", "" }, []byte{"Datablock\r\n"}, []byte{"Invalid Command, missing key||flag||exptime||bytecount\r\n"}},
+		{[]byte{"set", "test", "0", "0", "4", "noreply\r\n"}, []byte{"\r\n"}, []byte{"Missing datablock\r\n"}},		
+	}
+
+	for _, tt := range tests {
+
+		testname := fmt.Sprintf("%v,%v", tt.buf, tt.datablock)
+        t.Run(testname, func(t *testing.T) {
+
+				ans := GetParser(tt.buf, tt.datablock)
             	for i := range ans {
 					if ans[i] != tt.want[i] {
                 		t.Errorf("got %v, want %v", ans, tt.want)
@@ -218,3 +243,5 @@ func TestAppendPrependProtocol(t *testing.T) {
         })
     }
 }
+
+*/

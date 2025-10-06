@@ -1,4 +1,5 @@
-package protocol
+
+package protocolhandler
 
 import "strings"
 
@@ -79,6 +80,3 @@ func (p *Parser) Protocol_Handler() []string {
 	}
 	
 }
-
-
-
